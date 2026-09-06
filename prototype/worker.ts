@@ -14,7 +14,12 @@ type Bindings = {
   RESROBOT_LLT_OPERATOR_ID?: string;
 };
 
-const app = createMcpHonoApp();
+const app = createMcpHonoApp({
+  host: "0.0.0.0",
+  // Browser clients are not supported until an explicit origin allowlist exists.
+  // Requests without Origin continue to support non-browser MCP clients.
+  allowedOrigins: [],
+});
 
 app.get("/", (context) => {
   const status = providerStatus(context.env as Bindings);
