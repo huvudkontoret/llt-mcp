@@ -1,0 +1,25 @@
+{
+  "name": "hk-llt-mcp-prototype",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.1.2",
+  "scripts": {
+    "dev": "wrangler dev",
+    "prototype": "node prototype/cli.ts",
+    "verify:live-mapping": "node prototype/live-provider.smoke.ts",
+    "typecheck": "tsc --noEmit",
+    "cf-types": "wrangler types"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/hono": "2.0.0",
+    "@modelcontextprotocol/server": "2.0.0",
+    "hono": "4.13.5",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "26.4.1",
+    "typescript": "7.0.2",
+    "wrangler": "4.129.0"
+  }
+}

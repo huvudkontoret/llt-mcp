@@ -1,0 +1,17 @@
+bin/
+obj/
+.idea/
+.vscode/
+*.user
+*.suo
+TestResults/
+artifacts/
+data/*.zip
+.env
+.env.*
+!.env.example
+node_modules/
+.pnpm-store/
+.wrangler/
+.dev.vars*
+worker-configuration.d.ts
