@@ -63,6 +63,27 @@ Verify the tolerant API-response mappings without making network calls:
 pnpm verify:live-mapping
 ```
 
+## Deployment
+
+Pull requests run `lint`, `test`, and a non-mutating Wrangler dry-run without
+Cloudflare credentials. Pushes to `main` (or a manual `workflow_dispatch`) run
+the same verification first, then deploy and require the production health
+endpoint to return HTTP 200: `main -> verify -> deploy -> health`.
+
+Configure these GitHub Actions secrets for deployment:
+
+- `CLOUDFLARE_API_TOKEN` — scoped to the target account with only the Worker
+  script deployment permissions required by this repository.
+- `CLOUDFLARE_ACCOUNT_ID` — the target Cloudflare account ID.
+
+Set the non-secret repository variable `CLOUDFLARE_WORKER_URL` to the public
+Worker URL, without a trailing `/health` path. `TRAFIKLAB_API_KEY` and
+`RESROBOT_API_KEY` remain encrypted Worker secrets configured in Cloudflare;
+they are never duplicated into GitHub.
+
+See Cloudflare's [GitHub Actions authentication guidance](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/)
+and [Worker secrets guidance](https://developers.cloudflare.com/workers/configuration/secrets/).
+
 The terminal UI always uses deliberately small synthetic scenarios. Use the
 keyboard controls to vary walking distance, transfers, and intermediate-stop
 detail, then inspect the full structured result after every action.
