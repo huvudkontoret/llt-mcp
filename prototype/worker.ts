@@ -1,4 +1,10 @@
-import { createMcpHonoApp } from "@modelcontextprotocol/hono";
+import {
+  createMcpHonoApp,
+  hostHeaderValidation,
+  localhostHostValidation,
+  localhostOriginValidation,
+  originValidation,
+} from "@modelcontextprotocol/hono";
 import { createMcpHandler } from "@modelcontextprotocol/server";
 
 import { LiveTimetableProvider } from "./live-provider.ts";
@@ -12,13 +18,37 @@ type Bindings = {
   TRAFIKLAB_API_KEY?: string;
   RESROBOT_API_KEY?: string;
   RESROBOT_LLT_OPERATOR_ID?: string;
+  MCP_PUBLIC_URL?: string;
 };
 
 const app = createMcpHonoApp({
   host: "0.0.0.0",
-  // Browser clients are not supported until an explicit origin allowlist exists.
-  // Requests without Origin continue to support non-browser MCP clients.
-  allowedOrigins: [],
+});
+
+app.use("*", async (context, next) => {
+  const validation = publicUrlValidation(context.env as Bindings);
+  if (!validation.ok) {
+    return context.json(
+      {
+        error: "MCP_PUBLIC_URL must be an HTTPS URL, or an HTTP localhost URL.",
+      },
+      403,
+    );
+  }
+
+  const validateHost = validation.hostname
+    ? hostHeaderValidation([validation.hostname])
+    : localhostHostValidation();
+  const validateOrigin = validation.hostname
+    ? originValidation([validation.hostname])
+    : localhostOriginValidation();
+
+  const hostResponse = await validateHost(context, async () => {});
+  if (hostResponse) {
+    return hostResponse;
+  }
+
+  return validateOrigin(context, next);
 });
 
 app.get("/", (context) => {
@@ -88,4 +118,33 @@ function providerStatus(env: Bindings): {
 
 function dataMode(env: Bindings): "live" | "mock" {
   return env.DATA_MODE?.trim().toLowerCase() === "mock" ? "mock" : "live";
+}
+
+function publicUrlValidation(
+  env: Bindings,
+): { ok: true; hostname?: string } | { ok: false } {
+  if (env.MCP_PUBLIC_URL === undefined) {
+    return { ok: true };
+  }
+
+  try {
+    const publicUrl = new URL(env.MCP_PUBLIC_URL);
+    const hostname = publicUrl.hostname;
+    const isLocalhost = ["localhost", "127.0.0.1", "[::1]", "::1"].includes(hostname);
+    const isSupportedProtocol = publicUrl.protocol === "https:" ||
+      (publicUrl.protocol === "http:" && isLocalhost);
+
+    if (
+      !hostname ||
+      !isSupportedProtocol ||
+      publicUrl.username ||
+      publicUrl.password
+    ) {
+      return { ok: false };
+    }
+
+    return { ok: true, hostname };
+  } catch {
+    return { ok: false };
+  }
 }

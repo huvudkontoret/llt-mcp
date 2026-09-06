@@ -39,6 +39,13 @@ Wrangler reads `.env` natively during local development and exposes its values
 through the Worker's `env` bindings; the Node-only `dotenv` runtime package is
 therefore neither needed nor imported into the Worker bundle.
 
+Set the optional, non-secret `MCP_PUBLIC_URL` to the public Worker base URL,
+for example `https://worker.example.com`. It selects the one accepted Host and
+browser Origin at request time; its path, query, and fragment are ignored.
+`wrangler dev` reads it from `.env`; deployed Workers receive the same variable
+from Wrangler or Cloudflare environment configuration. HTTPS is required except
+for localhost development URLs. API keys remain separate secrets.
+
 Do not paste API keys into chat, source control, logs, or command arguments.
 `GET /health` reports only whether the required variables exist, never their
 values. Exact user coordinates are forwarded over HTTPS only for the requested
@@ -53,9 +60,9 @@ Run the interactive prototype:
 pnpm prototype
 ```
 
-The prototype intentionally accepts only localhost host/origin headers. Before
-deploying it to Workers, configure the final public hostname in Hono's MCP host
-and origin validation.
+Without `MCP_PUBLIC_URL`, the prototype accepts only localhost host/origin
+headers. A configured public hostname does not implicitly allow localhost,
+preview, or custom domains.
 
 Verify the tolerant API-response mappings without making network calls:
 
