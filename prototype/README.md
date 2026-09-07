@@ -1,9 +1,9 @@
-# LLT MCP logic prototype
+# Luleå bus MCP logic prototype
 
 > PROTOTYPE — throw this away or absorb the validated parts before production.
 
 The question is whether four small MCP tools and their structured responses are
-enough for an AI agent to answer practical LLT questions without storing data:
+enough for an AI agent to answer practical Luleå bus questions without storing data:
 stop search, nearby stops, planned departures, and journey planning with walking
 and transfers.
 
@@ -14,10 +14,13 @@ The MCP endpoint now defaults to live mode:
 - Trafiklab Timetables for planned departures
 - ResRobot Route planner for journeys
 
-Actual departures and every bus leg are filtered to Luleå Lokaltrafik. Stop
-candidates are restricted geographically and to local-bus stops, but remain
-marked as unverified until a departure or journey query proves the operator.
-Realtime fields are deliberately ignored.
+Actual departures and every bus leg are filtered to Luleå Lokaltrafik or
+Länstrafiken Norrbotten. A journey can contain both supported operators; an
+optional single `operator` input on journey and departure queries selects one
+provider and excludes mixed-provider journeys. Stop candidates are restricted
+geographically and to local-bus stops, but carry neutral `serviceVerification:
+"unverified"` until a departure or journey query proves the operator. Realtime
+fields are deliberately ignored.
 
 ## Local configuration
 
@@ -68,6 +71,7 @@ Verify the tolerant API-response mappings without making network calls:
 
 ```sh
 pnpm verify:live-mapping
+pnpm verify:mcp-contract
 ```
 
 ## Deployment
@@ -97,3 +101,8 @@ and [Worker secrets guidance](https://developers.cloudflare.com/workers/configur
 The terminal UI always uses deliberately small synthetic scenarios. Use the
 keyboard controls to vary walking distance, transfers, and intermediate-stop
 detail, then inspect the full structured result after every action.
+
+The replacement MCP tools are `search_lulea_bus_stops`,
+`find_nearby_lulea_bus_stops`, `plan_lulea_bus_journey`, and
+`get_lulea_bus_departures`. Exact user coordinates are still used only for the
+requested call and are never stored or logged.

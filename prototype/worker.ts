@@ -8,7 +8,7 @@ import {
 import { createMcpHandler } from "@modelcontextprotocol/server";
 
 import { LiveTimetableProvider } from "./live-provider.ts";
-import { createLltMcpServer } from "./mcp-server.ts";
+import { createLuleaBusMcpServer } from "./mcp-server.ts";
 import { MockTimetableProvider } from "./mock-provider.ts";
 import type { TimetableProvider } from "./provider.ts";
 import { TimetableService } from "./service.ts";
@@ -17,7 +17,6 @@ type Bindings = {
   DATA_MODE?: string;
   TRAFIKLAB_API_KEY?: string;
   RESROBOT_API_KEY?: string;
-  RESROBOT_LLT_OPERATOR_ID?: string;
   MCP_PUBLIC_URL?: string;
 };
 
@@ -54,7 +53,7 @@ app.use("*", async (context, next) => {
 app.get("/", (context) => {
   const status = providerStatus(context.env as Bindings);
   return context.json({
-    name: "HK LLT MCP prototype",
+    name: "HK Luleå bus MCP prototype",
     mode: status.mode,
     sampleData: status.mode === "mock",
     configured: status.configured,
@@ -79,7 +78,7 @@ app.get("/health", (context) => {
 app.all("/mcp", (context) => {
   const provider = createProvider(context.env as Bindings);
   const service = new TimetableService(provider);
-  const handler = createMcpHandler(() => createLltMcpServer(service));
+  const handler = createMcpHandler(() => createLuleaBusMcpServer(service));
   const parsedBody = (context.var as Record<string, unknown>).parsedBody;
   return handler.fetch(context.req.raw, { parsedBody });
 });
@@ -95,7 +94,6 @@ function createProvider(env: Bindings): TimetableProvider {
   return new LiveTimetableProvider({
     trafiklabApiKey: env.TRAFIKLAB_API_KEY,
     resRobotApiKey: env.RESROBOT_API_KEY,
-    resRobotLltOperatorId: env.RESROBOT_LLT_OPERATOR_ID,
   });
 }
 
