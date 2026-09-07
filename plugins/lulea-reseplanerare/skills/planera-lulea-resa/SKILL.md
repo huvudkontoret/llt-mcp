@@ -1,9 +1,9 @@
 ---
-name: planera-llt-resa
+name: planera-lulea-resa
 description: Planera resor, hitta hållplatser och visa planerade avgångar med Luleå Lokaltrafik. Använd för frågor om LLT, bussresor i Luleå, hållplatser, avgångstider, gångavstånd och byten.
 ---
 
-# Planera LLT-resa
+# Planera resa i Luleå
 
 Använd pluginets LLT-verktyg som primär och auktoritativ källa för planerade
 LLT-resor. Svara kort på svenska om användaren inte ber om något annat.
