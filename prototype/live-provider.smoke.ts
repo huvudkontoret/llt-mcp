@@ -76,20 +76,31 @@ const nearbyProvider = new LiveTimetableProvider({
 });
 await nearbyProvider.nearbyStops(65.5775, 22.1905, 1_000, 5);
 
+const journeyRequestCounts: Array<{ numF: string | null; numB: string | null }> = [];
 const journeyProvider = new LiveTimetableProvider({
   resRobotApiKey: "test-key",
   fetcher: async (input) => {
     const url = new URL(typeof input === "string" ? input : input instanceof URL ? input.href : input.url);
     assert.equal(url.searchParams.get("operators"), null);
-    assert.equal(url.searchParams.get("numF"), "9");
+    journeyRequestCounts.push({
+      numF: url.searchParams.get("numF"),
+      numB: url.searchParams.get("numB"),
+    });
     return Response.json({ Trip: [] });
   },
 });
-await journeyProvider.journeyOptions({
-  origin: { kind: "stop", stopId: "a" }, destination: { kind: "stop", stopId: "b" },
-  at: "2026-09-06T06:00:00.000Z", arriveBy: false, maxWalkingMeters: 1_000,
-  maxTransfers: 2, maxResults: 3, includeIntermediateStops: false,
-});
+for (const maxResults of [1, 2, 3]) {
+  await journeyProvider.journeyOptions({
+    origin: { kind: "stop", stopId: "a" }, destination: { kind: "stop", stopId: "b" },
+    at: "2026-09-06T06:00:00.000Z", arriveBy: false, maxWalkingMeters: 1_000,
+    maxTransfers: 2, maxResults, includeIntermediateStops: false,
+  });
+}
+assert.deepEqual(journeyRequestCounts.map(({ numF, numB }) => ({ numF, numB })), [
+  { numF: "3", numB: "0" },
+  { numF: "6", numB: "0" },
+  { numF: "6", numB: "0" },
+]);
 
 console.log("Live-provider mappings smoke check passed.");
 

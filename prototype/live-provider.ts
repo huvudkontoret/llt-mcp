@@ -107,7 +107,7 @@ export class LiveTimetableProvider implements TimetableProvider {
       date: queryTime.date,
       time: queryTime.time,
       searchForArrival: input.arriveBy ? 1 : 0,
-      numF: Math.max(input.maxResults * 3, 6),
+      numF: Math.min(6, Math.max(input.maxResults * 3, 1)),
       numB: 0,
       maxChange: Math.max(1, input.maxTransfers),
       products: localBusProduct,
