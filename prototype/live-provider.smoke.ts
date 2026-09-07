@@ -8,6 +8,7 @@ import {
   mapTrafiklabDeparturesResponse,
   mapTrafiklabStopResponse,
 } from "./live-provider.ts";
+import { createResRobotDeepLink } from "./resrobot-deep-link.ts";
 import { departureSchema, journeyOptionSchema, stopCandidateSchema } from "./schemas.ts";
 
 const trafiklabStops = mapTrafiklabStopResponse({
@@ -101,6 +102,50 @@ assert.deepEqual(journeyRequestCounts.map(({ numF, numB }) => ({ numF, numB })),
   { numF: "6", numB: "0" },
   { numF: "6", numB: "0" },
 ]);
+
+const stopLink = new URL(createResRobotDeepLink({
+  origin: { kind: "stop", stopId: "740000101" },
+  destination: { kind: "stop", stopId: "740000201" },
+  at: "2026-09-06T06:00:00.000Z",
+  arriveBy: false,
+}));
+assert.equal(stopLink.protocol, "https:");
+assert.equal(stopLink.host, "reseplanerare.resrobot.se");
+assert.equal(stopLink.pathname, "/bin/query.exe/sn");
+assert.equal(stopLink.searchParams.get("S"), "740000101");
+assert.equal(stopLink.searchParams.get("Z"), "740000201");
+assert.equal(stopLink.searchParams.get("date"), "2026-09-06");
+assert.equal(stopLink.searchParams.get("time"), "08:00");
+assert.equal(stopLink.searchParams.get("timesel"), "depart");
+assert.equal(stopLink.searchParams.get("start"), "1");
+assert.equal(stopLink.searchParams.has("accessId"), false);
+
+const coordinateLink = new URL(createResRobotDeepLink({
+  origin: { kind: "coordinates", latitude: 65.5775123, longitude: 22.1905127 },
+  destination: { kind: "coordinates", latitude: 65.5844996, longitude: 22.1540004 },
+  at: "2026-09-06T06:25:00.000Z",
+  arriveBy: true,
+}));
+assert.equal(coordinateLink.searchParams.get("SID"), "A=16@X=22190513@Y=65577512@O=Origin");
+assert.equal(coordinateLink.searchParams.get("ZID"), "A=16@X=22154000@Y=65584500@O=Destination");
+assert.equal(coordinateLink.searchParams.get("date"), "2026-09-06");
+assert.equal(coordinateLink.searchParams.get("time"), "08:25");
+assert.equal(coordinateLink.searchParams.get("timesel"), "arrive");
+assert.equal(coordinateLink.searchParams.get("start"), "1");
+assert.equal(coordinateLink.searchParams.has("accessId"), false);
+
+const linkedJourneyProvider = new LiveTimetableProvider({
+  resRobotApiKey: "test-key",
+  fetcher: async () => Response.json({ Trip: [tripFixture("linked", ["Luleå Lokaltrafik AB"])] }),
+});
+const linkedJourney = (await linkedJourneyProvider.journeyOptions({
+  origin: { kind: "stop", stopId: "740000101" },
+  destination: { kind: "stop", stopId: "740000201" },
+  at: "2026-09-06T06:00:00.000Z", arriveBy: false, maxWalkingMeters: 1_000,
+  maxTransfers: 2, maxResults: 1, includeIntermediateStops: false,
+}))[0];
+assert.ok(linkedJourney?.verificationUrl);
+assert.equal(new URL(linkedJourney.verificationUrl).searchParams.get("time"), "08:00");
 
 console.log("Live-provider mappings smoke check passed.");
 

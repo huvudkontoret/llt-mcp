@@ -51,7 +51,7 @@ export function createLuleaBusMcpServer(service: TimetableService): McpServer {
     {
       title: "Plan a Luleå bus journey",
       description:
-        "Plans up to three Luleå-area alternatives using Luleå Lokaltrafik and Länstrafiken Norrbotten, ordered by earliest planned arrival. Optionally select exactly one provider; mixed-provider journeys are then excluded. Accepts exact stop IDs or coordinates, never free text.",
+        "Plans up to three Luleå-area alternatives using Luleå Lokaltrafik and Länstrafiken Norrbotten, ordered by earliest planned arrival. Optionally select exactly one provider; mixed-provider journeys are then excluded. Live journey options include a verificationUrl that clients can offer as an independent ResRobot check; reopening it reruns the search and can produce updated or differently ordered results. Accepts exact stop IDs or coordinates, never free text.",
       inputSchema: planJourneyInputSchema,
       outputSchema: journeyOutputSchema,
       annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: true },

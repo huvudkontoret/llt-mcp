@@ -11,7 +11,8 @@ import {
   stopCandidateSchema,
 } from "./schemas.ts";
 
-const server = createLuleaBusMcpServer(new TimetableService(new MockTimetableProvider()));
+const mockService = new TimetableService(new MockTimetableProvider());
+const server = createLuleaBusMcpServer(mockService);
 const tools = (server as unknown as { _registeredTools: Record<string, { description?: string }> })
   ._registeredTools;
 const toolNames = Object.keys(tools).sort();
@@ -37,6 +38,14 @@ assert.equal(planJourneyInputSchema.parse({
   operator: "Luleå Lokaltrafik",
 }).operator, "Luleå Lokaltrafik");
 assert.throws(() => departuresInputSchema.parse({ stopId: "a", operator: "Both" }));
+assert.equal((await mockService.planJourney({
+  origin: { kind: "stop", stopId: "a" },
+  destination: { kind: "stop", stopId: "b" },
+  maxWalkingMeters: 1_000,
+  maxTransfers: 2,
+  maxResults: 3,
+  includeIntermediateStops: false,
+})).journeys.every((journey) => journey.verificationUrl === undefined), true);
 
 stopCandidateSchema.parse({
   stopId: "a", name: "A", latitude: 65.5, longitude: 22.1, serviceVerification: "unverified",
@@ -48,6 +57,7 @@ for (const operator of ["Luleå Lokaltrafik", "Länstrafiken Norrbotten"] as con
   });
   journeyOptionSchema.parse({
     id: operator, plannedDeparture: "2026-09-06T06:00:00.000Z", plannedArrival: "2026-09-06T06:10:00.000Z",
+    ...(operator === "Luleå Lokaltrafik" ? { verificationUrl: "https://reseplanerare.resrobot.se/bin/query.exe/sn?start=1" } : {}),
     durationMinutes: 10, transfers: 0, walkingDistanceMeters: 0,
     legs: [{
       mode: "bus", operator, line: "1", direction: "A",

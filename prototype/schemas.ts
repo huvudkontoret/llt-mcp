@@ -95,6 +95,7 @@ export const journeyLegSchema = z.discriminatedUnion("mode", [
 
 export const journeyOptionSchema = z.object({
   id: z.string(),
+  verificationUrl: z.url().optional(),
   plannedDeparture: dateTimeSchema,
   plannedArrival: dateTimeSchema,
   durationMinutes: z.number().int().nonnegative(),
