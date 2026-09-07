@@ -82,11 +82,14 @@ Configure these GitHub Actions secrets for deployment:
 - `CLOUDFLARE_API_TOKEN` — scoped to the target account with only the Worker
   script deployment permissions required by this repository.
 - `CLOUDFLARE_ACCOUNT_ID` — the target Cloudflare account ID.
+- `TRAFIKLAB_API_KEY` — the Trafiklab Realtime APIs key.
+- `RESROBOT_API_KEY` — the ResRobot v2.1 key.
 
 Set the non-secret repository variable `CLOUDFLARE_WORKER_URL` to the public
-Worker URL, without a trailing `/health` path. `TRAFIKLAB_API_KEY` and
-`RESROBOT_API_KEY` remain encrypted Worker secrets configured in Cloudflare;
-they are never duplicated into GitHub.
+Worker URL, without a trailing `/health` path. During deployment, the workflow
+uploads `TRAFIKLAB_API_KEY` and `RESROBOT_API_KEY` from GitHub Actions to
+Cloudflare as encrypted Worker runtime secrets. Their values are not committed,
+logged, or compiled into the Worker bundle.
 
 See Cloudflare's [GitHub Actions authentication guidance](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/)
 and [Worker secrets guidance](https://developers.cloudflare.com/workers/configuration/secrets/).
