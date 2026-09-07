@@ -13,6 +13,7 @@ import {
   stockholmLocalToIso,
   toStockholmQueryTime,
 } from "./time.ts";
+import { createResRobotDeepLink } from "./resrobot-deep-link.ts";
 
 const trafiklabBaseUrl = "https://realtime-api.trafiklab.se/v1";
 const resRobotBaseUrl = "https://api.resrobot.se/v2.1";
@@ -130,7 +131,15 @@ export class LiveTimetableProvider implements TimetableProvider {
       parameters,
     );
 
-    return mapResRobotJourneyResponse(response);
+    return mapResRobotJourneyResponse(response).map((journey) => ({
+      ...journey,
+      verificationUrl: createResRobotDeepLink({
+        origin: input.origin,
+        destination: input.destination,
+        at: input.arriveBy ? journey.plannedArrival : journey.plannedDeparture,
+        arriveBy: input.arriveBy,
+      }),
+    }));
   }
 
   async departures(

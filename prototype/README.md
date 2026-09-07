@@ -57,6 +57,13 @@ nearby-stop or journey query and are not stored or logged by this application.
 To run the server with explicit synthetic data instead, set `DATA_MODE=mock`.
 Synthetic responses always contain `sampleData: true`.
 
+Live journey options can include a `verificationUrl` that opens the corresponding
+search in ResRobot. It is an independent check rather than an immutable trip
+permalink, so reopening it can return updated or differently ordered results.
+Coordinate-based links contain the coordinates supplied for that journey and
+send them to ResRobot when opened. Clients must not log or share those links
+unexpectedly.
+
 Run the interactive prototype:
 
 ```sh
