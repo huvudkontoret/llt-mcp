@@ -5,10 +5,10 @@
   },
   "plugins": [
     {
-      "name": "llt-reseplanerare",
+      "name": "lulea-reseplanerare",
       "source": {
         "source": "local",
-        "path": "./plugins/llt-reseplanerare"
+        "path": "./plugins/lulea-reseplanerare"
       },
       "policy": {
         "installation": "AVAILABLE",
