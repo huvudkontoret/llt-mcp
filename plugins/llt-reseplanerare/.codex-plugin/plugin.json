@@ -1,0 +1,23 @@
+{
+  "name": "llt-reseplanerare",
+  "version": "0.1.0",
+  "description": "Planera resor med Luleå Lokaltrafiks planerade tider.",
+  "author": {
+    "name": "Huvudkontoret"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "LLT Reseplanerare",
+    "shortDescription": "Planera resor och se planerade LLT-avgångar.",
+    "longDescription": "Söker LLT-hållplatser och planerar resor med gång, byten och planerade avgångstider i Luleå.",
+    "developerName": "Huvudkontoret",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Read"],
+    "defaultPrompt": [
+      "Vilken buss ska jag ta från Gammelstad till Hertsön?",
+      "Visa nästa planerade avgång från Smedjegatan.",
+      "Hitta LLT-hållplatser nära en position."
+    ]
+  },
+  "mcpServers": "./.mcp.json"
+}
