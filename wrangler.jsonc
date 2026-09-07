@@ -3,6 +3,10 @@
   "name": "hk-llt-mcp-prototype",
   "main": "prototype/worker.ts",
   "compatibility_date": "2026-09-04",
+  "vars": {
+    "DATA_MODE": "live",
+    "MCP_PUBLIC_URL": "https://hk-llt-mcp-prototype.huvudkontoret-io.workers.dev"
+  },
   "observability": {
     "enabled": true,
     "logs": {
