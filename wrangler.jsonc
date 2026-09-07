@@ -3,9 +3,6 @@
   "name": "hk-llt-mcp-prototype",
   "main": "prototype/worker.ts",
   "compatibility_date": "2026-09-04",
-  "secrets": {
-    "required": ["TRAFIKLAB_API_KEY", "RESROBOT_API_KEY"]
-  },
   "observability": {
     "enabled": true,
     "logs": {
