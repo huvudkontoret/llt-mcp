@@ -54,7 +54,7 @@ export class MockTimetableProvider implements TimetableProvider {
     return stops
       .filter((stop) => stop.name.toLocaleLowerCase("sv-SE").includes(normalized))
       .slice(0, maxResults)
-      .map((stop) => ({ ...stop, lltService: "unverified" }));
+      .map((stop) => ({ ...stop, serviceVerification: "unverified" }));
   }
 
   async nearbyStops(
@@ -67,7 +67,7 @@ export class MockTimetableProvider implements TimetableProvider {
       .map((stop) => ({
         ...stop,
         distanceMeters: Math.round(distanceMeters(latitude, longitude, stop.latitude, stop.longitude)),
-        lltService: "unverified" as const,
+        serviceVerification: "unverified" as const,
       }))
       .filter((stop) => stop.distanceMeters <= radiusMeters)
       .sort((left, right) => left.distanceMeters - right.distanceMeters)

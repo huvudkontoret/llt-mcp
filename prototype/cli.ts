@@ -27,15 +27,15 @@ const reset = "\u001b[0m";
 async function runAction(key: string): Promise<boolean> {
   switch (key) {
     case "s":
-      state.lastAction = "search_llt_stops: Kronan";
+      state.lastAction = "search_lulea_bus_stops: Kronan";
       state.result = await service.searchStops("Kronan");
       break;
     case "n":
-      state.lastAction = "find_nearby_llt_stops: delad provposition";
+      state.lastAction = "find_nearby_lulea_bus_stops: delad provposition";
       state.result = await service.nearbyStops(65.5775, 22.1905, 1_000);
       break;
     case "j":
-      state.lastAction = "plan_llt_journey: Kronan → Sunderby sjukhus";
+      state.lastAction = "plan_lulea_bus_journey: Kronan → Sunderby sjukhus";
       state.result = await service.planJourney({
         origin: { kind: "coordinates", latitude: 65.5775, longitude: 22.1905 },
         destination: { kind: "stop", stopId: "sample:sunderby" },
@@ -46,7 +46,7 @@ async function runAction(key: string): Promise<boolean> {
       });
       break;
     case "d":
-      state.lastAction = "get_llt_departures: Kronan, kommande 60 minuter";
+      state.lastAction = "get_lulea_bus_departures: Kronan, kommande 60 minuter";
       state.result = await service.departures({
         stopId: "sample:kronan",
         maxResults: 10,
@@ -73,7 +73,7 @@ async function runAction(key: string): Promise<boolean> {
 
 function render(clear = true): void {
   if (clear) console.clear();
-  console.log(`${bold}LLT MCP — LOGIKPROTOTYP${reset}`);
+  console.log(`${bold}LULEÅ BUSS MCP — LOGIKPROTOTYP${reset}`);
   console.log(`${dim}Provdata, inte en aktuell tidtabell.${reset}\n`);
   console.log(`${bold}Inställningar${reset}`);
   console.log(`maxWalkingMeters: ${state.maxWalkingMeters}`);

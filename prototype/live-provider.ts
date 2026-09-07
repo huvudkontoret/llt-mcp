@@ -25,7 +25,6 @@ type Fetcher = typeof globalThis.fetch;
 export type LiveTimetableProviderOptions = {
   trafiklabApiKey?: string;
   resRobotApiKey?: string;
-  resRobotLltOperatorId?: string;
   fetcher?: Fetcher;
 };
 
@@ -47,13 +46,11 @@ export class LiveTimetableProvider implements TimetableProvider {
 
   private readonly trafiklabApiKey?: string;
   private readonly resRobotApiKey?: string;
-  private readonly resRobotLltOperatorId?: string;
   private readonly fetcher: Fetcher;
 
   constructor(options: LiveTimetableProviderOptions) {
     this.trafiklabApiKey = present(options.trafiklabApiKey);
     this.resRobotApiKey = present(options.resRobotApiKey);
-    this.resRobotLltOperatorId = present(options.resRobotLltOperatorId);
     this.fetcher = options.fetcher ?? globalThis.fetch.bind(globalThis);
   }
 
@@ -110,7 +107,7 @@ export class LiveTimetableProvider implements TimetableProvider {
       date: queryTime.date,
       time: queryTime.time,
       searchForArrival: input.arriveBy ? 1 : 0,
-      numF: this.resRobotLltOperatorId ? input.maxResults : 6,
+      numF: Math.max(input.maxResults * 3, 6),
       numB: 0,
       maxChange: Math.max(1, input.maxTransfers),
       products: localBusProduct,
@@ -124,9 +121,6 @@ export class LiveTimetableProvider implements TimetableProvider {
 
     addPlace(parameters, "origin", input.origin);
     addPlace(parameters, "dest", input.destination);
-    if (this.resRobotLltOperatorId) {
-      parameters.operators = this.resRobotLltOperatorId;
-    }
 
     const response = await getJson(
       this.fetcher,
@@ -202,7 +196,7 @@ export function mapResRobotNearbyResponse(
         {
           ...stop,
           distanceMeters: distance,
-          lltService: "unverified",
+          serviceVerification: "unverified",
         },
       ];
     })
@@ -306,7 +300,7 @@ function mapTrafiklabStopGroup(value: unknown): StopCandidate | undefined {
     longitude:
       coordinates.reduce((sum, coordinate) => sum + coordinate.longitude, 0) /
       coordinates.length,
-    lltService: "unverified",
+    serviceVerification: "unverified",
   };
 }
 

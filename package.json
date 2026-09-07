@@ -11,7 +11,8 @@
     "verify:worker": "node prototype/worker.smoke.ts",
     "typecheck": "tsc --noEmit",
     "lint": "pnpm typecheck",
-    "test": "pnpm verify:live-mapping && pnpm verify:worker",
+    "verify:mcp-contract": "node prototype/mcp-server.smoke.ts",
+    "test": "pnpm verify:live-mapping && pnpm verify:mcp-contract && pnpm verify:worker",
     "build": "wrangler deploy --dry-run --outdir .wrangler/dry-run",
     "cf-types": "wrangler types"
   },

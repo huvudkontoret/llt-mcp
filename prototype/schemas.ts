@@ -25,8 +25,13 @@ export const stopReferenceSchema = z.object({
 
 export const stopCandidateSchema = stopReferenceSchema.extend({
   distanceMeters: z.number().int().nonnegative().optional(),
-  lltService: z.literal("unverified"),
+  serviceVerification: z.literal("unverified"),
 });
+
+export const supportedOperatorSchema = z.enum([
+  "Luleå Lokaltrafik",
+  "Länstrafiken Norrbotten",
+]);
 
 export const stopSearchInputSchema = z.object({
   query: z.string().trim().min(1).max(100),
@@ -60,6 +65,7 @@ export const planJourneyInputSchema = z.object({
   maxTransfers: z.number().int().min(0).max(2).default(2),
   maxResults: z.number().int().min(1).max(3).default(3),
   includeIntermediateStops: z.boolean().default(false),
+  operator: supportedOperatorSchema.optional(),
 });
 
 const walkLegSchema = z.object({
@@ -72,7 +78,7 @@ const walkLegSchema = z.object({
 
 const busLegSchema = z.object({
   mode: z.literal("bus"),
-  operator: z.literal("Luleå Lokaltrafik"),
+  operator: supportedOperatorSchema,
   line: z.string(),
   direction: z.string(),
   fromStop: stopReferenceSchema,
@@ -111,9 +117,11 @@ export const departuresInputSchema = z.object({
   line: z.string().trim().min(1).optional(),
   direction: z.string().trim().min(1).optional(),
   maxResults: z.number().int().min(1).max(10).default(10),
+  operator: supportedOperatorSchema.optional(),
 });
 
 export const departureSchema = z.object({
+  operator: supportedOperatorSchema,
   line: z.string(),
   direction: z.string(),
   stop: stopReferenceSchema,
@@ -135,5 +143,6 @@ export type StopCandidate = z.infer<typeof stopCandidateSchema>;
 export type JourneyLeg = z.infer<typeof journeyLegSchema>;
 export type JourneyOption = z.infer<typeof journeyOptionSchema>;
 export type Departure = z.infer<typeof departureSchema>;
+export type SupportedOperator = z.infer<typeof supportedOperatorSchema>;
 export type PlanJourneyInput = z.infer<typeof planJourneyInputSchema>;
 export type DeparturesInput = z.infer<typeof departuresInputSchema>;

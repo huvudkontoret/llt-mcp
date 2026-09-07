@@ -1,4 +1,4 @@
-import { selectLltDepartures, selectLltJourneys } from "./domain.ts";
+import { selectSupportedDepartures, selectSupportedJourneys } from "./domain.ts";
 import type { TimetableProvider } from "./provider.ts";
 import {
   type DeparturesInput,
@@ -57,7 +57,7 @@ export class TimetableService {
     return {
       scheduleKind: "planned" as const,
       timeZone,
-      journeys: selectLltJourneys(rawJourneys, input),
+      journeys: selectSupportedJourneys(rawJourneys, input),
       sampleData: this.provider.sampleData,
       attribution: this.provider.attribution,
     };
@@ -70,7 +70,7 @@ export class TimetableService {
       scheduleKind: "planned" as const,
       timeZone,
       windowMinutes: 60 as const,
-      departures: selectLltDepartures(rawDepartures, input),
+      departures: selectSupportedDepartures(rawDepartures, input),
       sampleData: this.provider.sampleData,
       attribution: this.provider.attribution,
     };

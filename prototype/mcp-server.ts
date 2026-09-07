@@ -11,18 +11,18 @@ import {
   stopSearchInputSchema,
 } from "./schemas.ts";
 
-export function createLltMcpServer(service: TimetableService): McpServer {
+export function createLuleaBusMcpServer(service: TimetableService): McpServer {
   const server = new McpServer({
     name: "hk-llt-mcp-prototype",
     version: "0.0.0",
   });
 
   server.registerTool(
-    "search_llt_stops",
+    "search_lulea_bus_stops",
     {
-      title: "Search stop candidates in the LLT area",
+      title: "Search Luleå bus stop candidates",
       description:
-        "Searches geographically relevant stop candidates by name. Candidates are not operator-verified until a timetable query is made.",
+        "Searches geographically relevant Luleå-area bus stop candidates by name. Candidates are not operator-verified until a timetable query is made.",
       inputSchema: stopSearchInputSchema,
       outputSchema: stopCandidatesOutputSchema,
       annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: true },
@@ -31,11 +31,11 @@ export function createLltMcpServer(service: TimetableService): McpServer {
   );
 
   server.registerTool(
-    "find_nearby_llt_stops",
+    "find_nearby_lulea_bus_stops",
     {
-      title: "Find nearby stop candidates in the LLT area",
+      title: "Find nearby Luleå bus stops",
       description:
-        "Finds nearby stop candidates from WGS84 coordinates. The coordinates are used only for this query and are not stored.",
+        "Finds nearby Luleå-area bus stop candidates from WGS84 coordinates. The coordinates are used only for this query and are not stored.",
       inputSchema: nearbyStopsInputSchema,
       outputSchema: stopCandidatesOutputSchema,
       annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: true },
@@ -47,11 +47,11 @@ export function createLltMcpServer(service: TimetableService): McpServer {
   );
 
   server.registerTool(
-    "plan_llt_journey",
+    "plan_lulea_bus_journey",
     {
-      title: "Plan an LLT-only journey",
+      title: "Plan a Luleå bus journey",
       description:
-        "Plans up to three LLT-only alternatives, ordered by earliest planned arrival. Accepts exact stop IDs or coordinates, never free text.",
+        "Plans up to three Luleå-area alternatives using Luleå Lokaltrafik and Länstrafiken Norrbotten, ordered by earliest planned arrival. Optionally select exactly one provider; mixed-provider journeys are then excluded. Accepts exact stop IDs or coordinates, never free text.",
       inputSchema: planJourneyInputSchema,
       outputSchema: journeyOutputSchema,
       annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: true },
@@ -60,11 +60,11 @@ export function createLltMcpServer(service: TimetableService): McpServer {
   );
 
   server.registerTool(
-    "get_llt_departures",
+    "get_lulea_bus_departures",
     {
-      title: "Get planned LLT departures",
+      title: "Get planned Luleå bus departures",
       description:
-        "Returns at most ten planned LLT departures from an exact stop during a fixed 60-minute window. This is not live data.",
+        "Returns at most ten planned Luleå-area departures from Luleå Lokaltrafik and Länstrafiken Norrbotten during a fixed 60-minute window. Optionally select exactly one provider. This is not live data.",
       inputSchema: departuresInputSchema,
       outputSchema: departuresOutputSchema,
       annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: true },
