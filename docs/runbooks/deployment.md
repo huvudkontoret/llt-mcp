@@ -51,11 +51,15 @@ outages and no scheduled monitoring in this phase.
 
 ## Diagnostics
 
-Provider request failures emit only operation name, provider name, elapsed
+Application logs for provider request failures contain only operation name, provider name, elapsed
 milliseconds, HTTP status when available, and a fixed error category: `network`,
-`timeout`, `http`, `invalid_json`, or `provider_error`. No API keys, coordinates,
-queries, upstream URLs, or response bodies are logged. Invocation logs remain
-disabled, tracing is disabled, and query strings are redacted. A missing key is a configuration failure visible through `/health`.
+`timeout`, `http`, `invalid_json`, or `provider_error`. These application logs
+exclude API keys, coordinates, queries, upstream URLs, and response bodies.
+
+Cloudflare logs and traces are enabled with full sampling and persistence.
+Invocation logs remain disabled, and query-string redaction is disabled. These
+platform settings are separate from the sanitized application failure logs.
+A missing key is a configuration failure visible through `/health`.
 
 Inspect these diagnostics in Cloudflare Worker logs. HTTP 429 points to upstream
 rate limiting; network/timeouts can indicate an upstream outage. The service

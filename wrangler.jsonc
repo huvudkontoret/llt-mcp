@@ -9,12 +9,19 @@
   },
   "observability": {
     "enabled": true,
-    "redact_query_string": true,
+    "head_sampling_rate": 1,
+    "redact_query_string": false,
     "logs": {
       "enabled": true,
+      "head_sampling_rate": 1,
       "invocation_logs": false,
+      "persist": true,
     },
-    "traces": { "enabled": false },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true,
+    },
   },
   "env": {
     "local": {
