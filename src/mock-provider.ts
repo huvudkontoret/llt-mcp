@@ -1,11 +1,6 @@
 import { lltOperator } from "./domain.ts";
 import type { ProviderJourneyOption, TimetableProvider } from "./provider.ts";
-import type {
-  Departure,
-  Place,
-  StopCandidate,
-  StopReference,
-} from "./schemas.ts";
+import type { Departure, Place, StopCandidate, StopReference } from "./schemas.ts";
 
 const kronan: StopReference = {
   stopId: "sample:kronan",
@@ -66,7 +61,9 @@ export class MockTimetableProvider implements TimetableProvider {
     return stops
       .map((stop) => ({
         ...stop,
-        distanceMeters: Math.round(distanceMeters(latitude, longitude, stop.latitude, stop.longitude)),
+        distanceMeters: Math.round(
+          distanceMeters(latitude, longitude, stop.latitude, stop.longitude),
+        ),
         serviceVerification: "unverified" as const,
       }))
       .filter((stop) => stop.distanceMeters <= radiusMeters)
@@ -236,9 +233,10 @@ export class MockTimetableProvider implements TimetableProvider {
     ];
   }
 
-  async departures(input: { stopId: string; from?: string }): Promise<
-    Array<Departure & { operator: string }>
-  > {
+  async departures(input: {
+    stopId: string;
+    from?: string;
+  }): Promise<Array<Departure & { operator: string }>> {
     const anchor = input.from ? Date.parse(input.from) : Date.now();
     const start = Number.isNaN(anchor) ? Date.now() : anchor;
     const at = (minutes: number) => new Date(start + minutes * 60_000).toISOString();

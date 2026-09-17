@@ -1,10 +1,6 @@
 import { selectSupportedDepartures, selectSupportedJourneys } from "./domain.ts";
 import type { TimetableProvider } from "./provider.ts";
-import {
-  type DeparturesInput,
-  type PlanJourneyInput,
-  timeZone,
-} from "./schemas.ts";
+import { type DeparturesInput, type PlanJourneyInput, timeZone } from "./schemas.ts";
 
 export class TimetableService {
   private readonly provider: TimetableProvider;
@@ -22,19 +18,9 @@ export class TimetableService {
     };
   }
 
-  async nearbyStops(
-    latitude: number,
-    longitude: number,
-    radiusMeters = 1_000,
-    maxResults = 5,
-  ) {
+  async nearbyStops(latitude: number, longitude: number, radiusMeters = 1_000, maxResults = 5) {
     return {
-      candidates: await this.provider.nearbyStops(
-        latitude,
-        longitude,
-        radiusMeters,
-        maxResults,
-      ),
+      candidates: await this.provider.nearbyStops(latitude, longitude, radiusMeters, maxResults),
       operatorVerification: "deferred-until-timetable-query" as const,
       sampleData: this.provider.sampleData,
       attribution: this.provider.attribution,

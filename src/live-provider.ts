@@ -42,8 +42,7 @@ type JourneyQuery = {
 
 export class LiveTimetableProvider implements TimetableProvider {
   readonly sampleData = false;
-  readonly attribution =
-    "Trafiklab Realtime APIs (CC BY 4.0) and ResRobot v2.1";
+  readonly attribution = "Trafiklab Realtime APIs (CC BY 4.0) and ResRobot v2.1";
 
   private readonly trafiklabApiKey?: string;
   private readonly resRobotApiKey?: string;
@@ -59,6 +58,7 @@ export class LiveTimetableProvider implements TimetableProvider {
     const response = await getJson(
       this.fetcher,
       "Trafiklab",
+      "search_lulea_bus_stops",
       trafiklabBaseUrl,
       `/stops/name/${encodeURIComponent(query)}`,
       { key: requireKey(this.trafiklabApiKey, "TRAFIKLAB_API_KEY") },
@@ -76,6 +76,7 @@ export class LiveTimetableProvider implements TimetableProvider {
     const response = await getJson(
       this.fetcher,
       "ResRobot",
+      "find_nearby_lulea_bus_stops",
       resRobotBaseUrl,
       "/location.nearbystops",
       {
@@ -89,20 +90,15 @@ export class LiveTimetableProvider implements TimetableProvider {
       },
     );
 
-    return mapResRobotNearbyResponse(
-      response,
-      latitude,
-      longitude,
-      radiusMeters,
-    ).slice(0, maxResults);
+    return mapResRobotNearbyResponse(response, latitude, longitude, radiusMeters).slice(
+      0,
+      maxResults,
+    );
   }
 
   async journeyOptions(input: JourneyQuery): Promise<ProviderJourneyOption[]> {
     const queryTime = toStockholmQueryTime(input.at);
-    const walk =
-      input.maxWalkingMeters === 0
-        ? "0"
-        : `1,0,${input.maxWalkingMeters}`;
+    const walk = input.maxWalkingMeters === 0 ? "0" : `1,0,${input.maxWalkingMeters}`;
     const parameters: Record<string, string | number | boolean> = {
       accessId: requireKey(this.resRobotApiKey, "RESROBOT_API_KEY"),
       date: queryTime.date,
@@ -126,6 +122,7 @@ export class LiveTimetableProvider implements TimetableProvider {
     const response = await getJson(
       this.fetcher,
       "ResRobot",
+      "plan_lulea_bus_journey",
       resRobotBaseUrl,
       "/trip",
       parameters,
@@ -150,18 +147,17 @@ export class LiveTimetableProvider implements TimetableProvider {
     const response = await getJson(
       this.fetcher,
       "Trafiklab",
+      "get_lulea_bus_departures",
       trafiklabBaseUrl,
       `/departures/${encodeURIComponent(input.stopId)}/${queryTime.dateTime}`,
       { key: requireKey(this.trafiklabApiKey, "TRAFIKLAB_API_KEY") },
     );
 
     const windowEnd = anchor.getTime() + 60 * 60_000;
-    return mapTrafiklabDeparturesResponse(response, input.stopId).filter(
-      (departure) => {
-        const planned = Date.parse(departure.plannedDeparture);
-        return planned >= anchor.getTime() && planned <= windowEnd;
-      },
-    );
+    return mapTrafiklabDeparturesResponse(response, input.stopId).filter((departure) => {
+      const planned = Date.parse(departure.plannedDeparture);
+      return planned >= anchor.getTime() && planned <= windowEnd;
+    });
   }
 }
 
@@ -183,9 +179,7 @@ export function mapResRobotNearbyResponse(
 ): StopCandidate[] {
   const response = record(value);
   const container = response?.stopLocationOrCoordLocation ?? response?.StopLocation;
-  const entries = Array.isArray(container)
-    ? container
-    : array(record(container)?.StopLocation);
+  const entries = Array.isArray(container) ? container : array(record(container)?.StopLocation);
 
   return entries
     .map((entry) => record(record(entry)?.StopLocation ?? entry))
@@ -197,8 +191,7 @@ export function mapResRobotNearbyResponse(
 
       const suppliedDistance = finiteNumber(entry.dist);
       const distance = Math.round(
-        suppliedDistance ??
-          distanceMeters(latitude, longitude, stop.latitude, stop.longitude),
+        suppliedDistance ?? distanceMeters(latitude, longitude, stop.latitude, stop.longitude),
       );
 
       return [
@@ -248,8 +241,7 @@ export function mapTrafiklabDeparturesResponse(
       const longitude = finiteNumber(stop?.lon);
       const name = text(stop?.name);
       const line = text(route?.designation) ?? text(route?.name);
-      const direction =
-        text(route?.direction) ?? text(record(route?.destination)?.name);
+      const direction = text(route?.direction) ?? text(record(route?.destination)?.name);
 
       if (
         text(route?.transport_mode)?.toUpperCase() !== "BUS" ||
@@ -274,10 +266,7 @@ export function mapTrafiklabDeparturesResponse(
         plannedDeparture,
       };
     })
-    .filter(
-      (departure): departure is Departure & { operator: string } =>
-        departure !== undefined,
-    );
+    .filter((departure): departure is Departure & { operator: string } => departure !== undefined);
 }
 
 function mapTrafiklabStopGroup(value: unknown): StopCandidate | undefined {
@@ -304,11 +293,9 @@ function mapTrafiklabStopGroup(value: unknown): StopCandidate | undefined {
     stopId,
     name,
     latitude:
-      coordinates.reduce((sum, coordinate) => sum + coordinate.latitude, 0) /
-      coordinates.length,
+      coordinates.reduce((sum, coordinate) => sum + coordinate.latitude, 0) / coordinates.length,
     longitude:
-      coordinates.reduce((sum, coordinate) => sum + coordinate.longitude, 0) /
-      coordinates.length,
+      coordinates.reduce((sum, coordinate) => sum + coordinate.longitude, 0) / coordinates.length,
     serviceVerification: "unverified",
   };
 }
@@ -350,9 +337,7 @@ function mapResRobotTrip(value: unknown): ProviderJourneyOption | undefined {
   };
 }
 
-function mapResRobotLeg(
-  value: unknown,
-): ProviderJourneyOption["legs"][number] | undefined {
+function mapResRobotLeg(value: unknown): ProviderJourneyOption["legs"][number] | undefined {
   const leg = record(value);
   const products = array(leg?.Product).map(record).filter(isPresent);
   const origin = record(leg?.Origin);
@@ -376,9 +361,7 @@ function mapResRobotLeg(
     };
   }
 
-  const product = products.find(
-    (candidate) => Number(text(candidate.cls)) === localBusProduct,
-  );
+  const product = products.find((candidate) => Number(text(candidate.cls)) === localBusProduct);
   if (!product) return undefined;
 
   const fromStop = stopReference(origin);
@@ -393,14 +376,7 @@ function mapResRobotLeg(
     text(leg?.name);
   const direction = text(leg?.direction) ?? toStop?.name;
 
-  if (
-    !fromStop ||
-    !toStop ||
-    !plannedDeparture ||
-    !plannedArrival ||
-    !line ||
-    !direction
-  ) {
+  if (!fromStop || !toStop || !plannedDeparture || !plannedArrival || !line || !direction) {
     return undefined;
   }
 
@@ -423,9 +399,7 @@ function mapResRobotLeg(
 
 function resRobotIntermediateStops(leg: Record<string, unknown>): StopReference[] {
   const rawStops = leg.Stops;
-  const entries = Array.isArray(rawStops)
-    ? rawStops
-    : array(record(rawStops)?.Stop);
+  const entries = Array.isArray(rawStops) ? rawStops : array(record(rawStops)?.Stop);
 
   return entries.map(stopReference).filter(isPresent);
 }
@@ -484,6 +458,11 @@ function addPlace(
 async function getJson(
   fetcher: Fetcher,
   provider: "Trafiklab" | "ResRobot",
+  operation:
+    | "search_lulea_bus_stops"
+    | "find_nearby_lulea_bus_stops"
+    | "plan_lulea_bus_journey"
+    | "get_lulea_bus_departures",
   baseUrl: string,
   path: string,
   parameters: Record<string, string | number | boolean>,
@@ -493,17 +472,40 @@ async function getJson(
     url.searchParams.set(key, String(value));
   }
 
+  const started = performance.now();
+  const signal = AbortSignal.timeout(10_000);
+  const reportFailure = (
+    category: "timeout" | "network" | "http" | "invalid_json" | "provider_error",
+    status: number | null,
+  ) => {
+    console.error(
+      JSON.stringify({
+        operation,
+        provider,
+        durationMs: Math.round(performance.now() - started),
+        status,
+        category,
+      }),
+    );
+  };
   let response: Response;
   try {
     response = await fetcher(url, {
       headers: { Accept: "application/json" },
-      signal: AbortSignal.timeout(10_000),
+      signal,
     });
-  } catch {
+  } catch (error) {
+    reportFailure(
+      signal.aborted || (error instanceof Error && error.name === "TimeoutError")
+        ? "timeout"
+        : "network",
+      null,
+    );
     throw new Error(`${provider} kunde inte nås.`);
   }
 
   if (!response.ok) {
+    reportFailure("http", response.status);
     throw new Error(`${provider} svarade med HTTP ${response.status}.`);
   }
 
@@ -511,11 +513,17 @@ async function getJson(
   try {
     body = await response.json();
   } catch {
+    reportFailure(signal.aborted ? "timeout" : "invalid_json", response.status);
     throw new Error(`${provider} returnerade ett ogiltigt JSON-svar.`);
   }
 
   if (provider === "ResRobot") {
-    throwForResRobotError(body);
+    try {
+      throwForResRobotError(body);
+    } catch (error) {
+      reportFailure("provider_error", response.status);
+      throw error;
+    }
   }
 
   return body;
@@ -541,12 +549,8 @@ function present(value: string | undefined): string | undefined {
 
 function isInLltArea(latitude: number, longitude: number): boolean {
   return (
-    distanceMeters(
-      luleaCenter.latitude,
-      luleaCenter.longitude,
-      latitude,
-      longitude,
-    ) <= lltAreaRadiusMeters
+    distanceMeters(luleaCenter.latitude, luleaCenter.longitude, latitude, longitude) <=
+    lltAreaRadiusMeters
   );
 }
 

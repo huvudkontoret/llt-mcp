@@ -1,5 +1,5 @@
-import { MockTimetableProvider } from "./mock-provider.ts";
-import { TimetableService } from "./service.ts";
+import { MockTimetableProvider } from "../src/mock-provider.ts";
+import { TimetableService } from "../src/service.ts";
 
 type PrototypeState = {
   maxWalkingMeters: number;

@@ -28,10 +28,7 @@ export const stopCandidateSchema = stopReferenceSchema.extend({
   serviceVerification: z.literal("unverified"),
 });
 
-export const supportedOperatorSchema = z.enum([
-  "Luleå Lokaltrafik",
-  "Länstrafiken Norrbotten",
-]);
+export const supportedOperatorSchema = z.enum(["Luleå Lokaltrafik", "Länstrafiken Norrbotten"]);
 
 export const stopSearchInputSchema = z.object({
   query: z.string().trim().min(1).max(100),
@@ -88,10 +85,7 @@ const busLegSchema = z.object({
   intermediateStops: z.array(stopReferenceSchema).optional(),
 });
 
-export const journeyLegSchema = z.discriminatedUnion("mode", [
-  walkLegSchema,
-  busLegSchema,
-]);
+export const journeyLegSchema = z.discriminatedUnion("mode", [walkLegSchema, busLegSchema]);
 
 export const journeyOptionSchema = z.object({
   id: z.string(),

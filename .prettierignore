@@ -1,0 +1,9 @@
+node_modules/
+.pnpm-store/
+.wrangler/
+pnpm-lock.yaml
+worker-configuration.d.ts
+chatgpt-app-submission.json
+.claude/
+.editorconfig
+.prettierrc

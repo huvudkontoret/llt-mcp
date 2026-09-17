@@ -51,9 +51,7 @@ export function createLuleaBusMcpServer(service: TimetableService): McpServer {
       },
     },
     async ({ latitude, longitude, radiusMeters, maxResults }) =>
-      toolResult(
-        await service.nearbyStops(latitude, longitude, radiusMeters, maxResults),
-      ),
+      toolResult(await service.nearbyStops(latitude, longitude, radiusMeters, maxResults)),
   );
 
   server.registerTool(

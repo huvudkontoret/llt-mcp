@@ -38,9 +38,7 @@ export function stockholmLocalToIso(value: string): string {
     return instant.toISOString();
   }
 
-  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.\d+)?)?$/.exec(
-    value,
-  );
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.\d+)?)?$/.exec(value);
   if (!match) {
     throw new Error("Datakällan returnerade en ogiltig lokal tidpunkt.");
   }
@@ -68,19 +66,14 @@ export function combineStockholmDateTime(date: string, time: string): string {
 export function isoDurationMinutes(value: string | undefined): number | undefined {
   if (!value) return undefined;
 
-  const match = /^P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$/.exec(
-    value,
-  );
+  const match = /^P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$/.exec(value);
   if (!match) return undefined;
 
   const [, days = "0", hours = "0", minutes = "0", seconds = "0"] = match;
   return Math.max(
     0,
     Math.round(
-      Number(days) * 24 * 60 +
-        Number(hours) * 60 +
-        Number(minutes) +
-        Number(seconds) / 60,
+      Number(days) * 24 * 60 + Number(hours) * 60 + Number(minutes) + Number(seconds) / 60,
     ),
   );
 }
@@ -99,7 +92,9 @@ function stockholmOffsetMilliseconds(instant: Date): number {
   return representedAsUtc - instant.getTime();
 }
 
-function dateParts(instant: Date): Record<"year" | "month" | "day" | "hour" | "minute" | "second", string> {
+function dateParts(
+  instant: Date,
+): Record<"year" | "month" | "day" | "hour" | "minute" | "second", string> {
   const result = Object.fromEntries(
     stockholmFormatter
       .formatToParts(instant)
@@ -107,8 +102,5 @@ function dateParts(instant: Date): Record<"year" | "month" | "day" | "hour" | "m
       .map((part) => [part.type, part.value]),
   );
 
-  return result as Record<
-    "year" | "month" | "day" | "hour" | "minute" | "second",
-    string
-  >;
+  return result as Record<"year" | "month" | "day" | "hour" | "minute" | "second", string>;
 }
