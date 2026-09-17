@@ -25,7 +25,12 @@ export function createLuleaBusMcpServer(service: TimetableService): McpServer {
         "Searches geographically relevant Luleå-area bus stop candidates by name. Candidates are not operator-verified until a timetable query is made.",
       inputSchema: stopSearchInputSchema,
       outputSchema: stopCandidatesOutputSchema,
-      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: true },
+      annotations: {
+        readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: false,
+        destructiveHint: false,
+      },
     },
     async ({ query, maxResults }) => toolResult(await service.searchStops(query, maxResults)),
   );
@@ -38,7 +43,12 @@ export function createLuleaBusMcpServer(service: TimetableService): McpServer {
         "Finds nearby Luleå-area bus stop candidates from WGS84 coordinates. The coordinates are used only for this query and are not stored.",
       inputSchema: nearbyStopsInputSchema,
       outputSchema: stopCandidatesOutputSchema,
-      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: true },
+      annotations: {
+        readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: false,
+        destructiveHint: false,
+      },
     },
     async ({ latitude, longitude, radiusMeters, maxResults }) =>
       toolResult(
@@ -54,7 +64,12 @@ export function createLuleaBusMcpServer(service: TimetableService): McpServer {
         "Plans up to three Luleå-area alternatives using Luleå Lokaltrafik and Länstrafiken Norrbotten, ordered by earliest planned arrival. Optionally select exactly one provider; mixed-provider journeys are then excluded. Live journey options include a verificationUrl that clients can offer as an independent ResRobot check; reopening it reruns the search and can produce updated or differently ordered results. Accepts exact stop IDs or coordinates, never free text.",
       inputSchema: planJourneyInputSchema,
       outputSchema: journeyOutputSchema,
-      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: true },
+      annotations: {
+        readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: false,
+        destructiveHint: false,
+      },
     },
     async (input) => toolResult(await service.planJourney(input)),
   );
@@ -67,7 +82,12 @@ export function createLuleaBusMcpServer(service: TimetableService): McpServer {
         "Returns at most ten planned Luleå-area departures from Luleå Lokaltrafik and Länstrafiken Norrbotten during a fixed 60-minute window. Optionally select exactly one provider. This is not live data.",
       inputSchema: departuresInputSchema,
       outputSchema: departuresOutputSchema,
-      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: true },
+      annotations: {
+        readOnlyHint: true,
+        idempotentHint: true,
+        openWorldHint: false,
+        destructiveHint: false,
+      },
     },
     async (input) => toolResult(await service.departures(input)),
   );
