@@ -58,18 +58,12 @@ export function selectSupportedDepartures(
         !wantedDirection ||
         departure.direction.toLocaleLowerCase("sv-SE").includes(wantedDirection),
     )
-    .sort(
-      (left, right) =>
-        Date.parse(left.plannedDeparture) - Date.parse(right.plannedDeparture),
-    )
+    .sort((left, right) => Date.parse(left.plannedDeparture) - Date.parse(right.plannedDeparture))
     .slice(0, selection.maxResults);
 }
 
 export function canonicalizeOperator(operator: string): SupportedOperator | undefined {
-  const normalized = operator
-    .trim()
-    .toLocaleLowerCase("sv-SE")
-    .replace(/\s+/g, " ");
+  const normalized = operator.trim().toLocaleLowerCase("sv-SE").replace(/\s+/g, " ");
 
   if (
     normalized === "llt" ||
@@ -98,9 +92,15 @@ function hasOnlySupportedBusLegs(journey: ProviderJourneyOption): journey is Jou
   return busLegs.length > 0 && busLegs.every((leg) => canonicalizeOperator(leg.operator));
 }
 
-function journeyHasOnlyOperator(journey: ProviderJourneyOption, operator: SupportedOperator): boolean {
+function journeyHasOnlyOperator(
+  journey: ProviderJourneyOption,
+  operator: SupportedOperator,
+): boolean {
   return journey.legs
-    .filter((leg): leg is Extract<JourneyLeg, { mode: "bus" }> & { operator: string } => leg.mode === "bus")
+    .filter(
+      (leg): leg is Extract<JourneyLeg, { mode: "bus" }> & { operator: string } =>
+        leg.mode === "bus",
+    )
     .every((leg) => canonicalizeOperator(leg.operator) === operator);
 }
 

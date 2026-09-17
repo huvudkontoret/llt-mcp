@@ -118,9 +118,7 @@ function dataMode(env: Bindings): "live" | "mock" {
   return env.DATA_MODE?.trim().toLowerCase() === "mock" ? "mock" : "live";
 }
 
-function publicUrlValidation(
-  env: Bindings,
-): { ok: true; hostname?: string } | { ok: false } {
+function publicUrlValidation(env: Bindings): { ok: true; hostname?: string } | { ok: false } {
   if (env.MCP_PUBLIC_URL === undefined) {
     return { ok: true };
   }
@@ -129,15 +127,10 @@ function publicUrlValidation(
     const publicUrl = new URL(env.MCP_PUBLIC_URL);
     const hostname = publicUrl.hostname;
     const isLocalhost = ["localhost", "127.0.0.1", "[::1]", "::1"].includes(hostname);
-    const isSupportedProtocol = publicUrl.protocol === "https:" ||
-      (publicUrl.protocol === "http:" && isLocalhost);
+    const isSupportedProtocol =
+      publicUrl.protocol === "https:" || (publicUrl.protocol === "http:" && isLocalhost);
 
-    if (
-      !hostname ||
-      !isSupportedProtocol ||
-      publicUrl.username ||
-      publicUrl.password
-    ) {
+    if (!hostname || !isSupportedProtocol || publicUrl.username || publicUrl.password) {
       return { ok: false };
     }
 

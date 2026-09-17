@@ -1,20 +1,25 @@
 {
-  "name": "hk-llt-mcp-prototype",
-  "version": "0.0.0",
+  "name": "hk-llt-mcp",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.1.2",
   "scripts": {
-    "dev": "wrangler dev",
-    "prototype": "node prototype/cli.ts",
-    "verify:live-mapping": "node prototype/live-provider.smoke.ts",
-    "verify:worker": "node prototype/worker.smoke.ts",
+    "dev": "wrangler dev --env local",
+    "prototype": "pnpm demo",
+    "verify:live-mapping": "node --test tests/live-provider.test.ts",
+    "verify:worker": "node --test tests/worker.test.ts tests/mcp-http.test.ts",
     "typecheck": "tsc --noEmit",
-    "lint": "pnpm typecheck",
-    "verify:mcp-contract": "node prototype/mcp-server.smoke.ts",
-    "test": "pnpm verify:live-mapping && pnpm verify:mcp-contract && pnpm verify:worker",
+    "lint": "pnpm typecheck && pnpm format:check",
+    "verify:mcp-contract": "node --test tests/mcp-server.test.ts tests/mcp-http.test.ts",
+    "test": "node --test tests/*.test.ts",
     "build": "wrangler deploy --dry-run --outdir .wrangler/dry-run",
-    "cf-types": "wrangler types"
+    "cf-types": "wrangler types",
+    "dev:mock": "wrangler dev --env mock --env-file config/mock.env",
+    "demo": "node examples/demo.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "verify:deployed": "node scripts/verify-deployed.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/hono": "2.0.0",
@@ -23,8 +28,13 @@
     "zod": "4.5.4"
   },
   "devDependencies": {
+    "@modelcontextprotocol/client": "2.0.0",
     "@types/node": "26.4.1",
+    "prettier": "3.9.7",
     "typescript": "7.0.2",
     "wrangler": "4.129.0"
+  },
+  "engines": {
+    "node": ">=24 <25"
   }
 }

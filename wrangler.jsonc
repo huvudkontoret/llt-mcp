@@ -1,17 +1,33 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "hk-llt-mcp-prototype",
-  "main": "prototype/worker.ts",
+  "main": "src/worker.ts",
   "compatibility_date": "2026-09-04",
   "vars": {
     "DATA_MODE": "live",
-    "MCP_PUBLIC_URL": "https://hk-llt-mcp-prototype.huvudkontoret-io.workers.dev"
+    "MCP_PUBLIC_URL": "https://hk-llt-mcp-prototype.huvudkontoret-io.workers.dev",
   },
   "observability": {
     "enabled": true,
+    "redact_query_string": true,
     "logs": {
       "enabled": true,
-      "invocation_logs": false
-    }
-  }
+      "invocation_logs": false,
+    },
+    "traces": { "enabled": false },
+  },
+  "env": {
+    "local": {
+      "vars": {
+        "DATA_MODE": "live",
+        "MCP_PUBLIC_URL": "http://localhost:8787",
+      },
+    },
+    "mock": {
+      "vars": {
+        "DATA_MODE": "mock",
+        "MCP_PUBLIC_URL": "http://localhost:8787",
+      },
+    },
+  },
 }

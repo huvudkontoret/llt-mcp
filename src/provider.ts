@@ -39,7 +39,7 @@ export interface TimetableProvider {
     includeIntermediateStops: boolean;
   }): Promise<ProviderJourneyOption[]>;
 
-  departures(input: Pick<DeparturesInput, "stopId" | "from">): Promise<
-    Array<Departure & { operator: string }>
-  >;
+  departures(
+    input: Pick<DeparturesInput, "stopId" | "from">,
+  ): Promise<Array<Departure & { operator: string }>>;
 }
